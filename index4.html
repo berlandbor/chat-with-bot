@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Обучающийся чат-бот</title>
+    <style>
+       body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    flex-direction: column; /
+}
+
+header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+h1 {
+    color: #333;
+    font-size: 2em;
+}
+
+h3 {
+    color: #666;
+    font-size: 1.2em;
+    margin-top: 10px;
+}
+
+/* Расположим контент по центру страницы */
+
+
+#chatWindow {
+    width: 400px;
+    height: 500px;
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(135deg, #ffffff, #e9e9e9);
+    padding: 20px;
+}
+
+#chatLog {
+    max-height: 400px;
+    overflow-y: auto;
+    border-radius: 10px;
+    border: 1px solid #e1e1e1;
+    padding: 10px;
+    background-color: #fff;
+    margin-bottom: 20px;
+}
+
+    
+    
+ #inputContainer {
+    display: flex;
+    align-items: center;
+}
+
+#userInput {
+    width: 70%;
+    padding: 10px;
+    border: 1px solid #e1e1e1;
+    border-radius: 10px;
+    outline: none;
+    box-sizing: border-box;
+    flex-grow: 1; /* Разрешает элементу расти и занимать доступное пространство */
+    margin-right: 10px; /* Добавляет небольшой отступ между полем ввода и кнопкой */
+}
+
+
+
+#sendButton {
+    width: 25%;
+    background-color: #007BFF;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 11px;
+    margin-left: 5%;
+    cursor: pointer;
+    transition: 0.3s;
+    flex-shrink: 0; 
+}
+
+#sendButton:hover {
+    background-color: #0056b3;
+}
+    </style>
+</head>
+<body>
+  <header>
+    <h1>Обучающийся чат-бот</h1>
+    <h3>berlandbor</h3>
+  </header>
+<section>
+<div id="chatWindow">
+    <div id="chatLog"></div>
+<div id="inputContainer">
+    <input type="text" id="userInput" placeholder="Введите ваше сообщение...">
+    <button id="sendButton">Отправить</button>
+</div>
+</div>
+</section>
+<script>
+    const greetingsPattern = /привет(ик)?!?/i;
+    const howAreYouPattern = /(как (дела|ты|поживаешь|настроение))\??/i;
+
+    const greetings = [
+        "Привет! Как дела?",
+        "Добрый день! Чем могу помочь?",
+        "Здравствуйте! Готов ответить на ваши вопросы.",
+        "Приветствую вас в чате!"
+    ];
+
+    document.getElementById('sendButton').addEventListener('click', function() {
+        var userInput = document.getElementById('userInput').value;
+        if (userInput) {
+            var userMessage = document.createElement('div');
+            userMessage.textContent = "Вы: " + userInput;
+            document.getElementById('chatLog').appendChild(userMessage);
+
+            var botReply = getBotReply(userInput); 
+            var botMessage = document.createElement('div');
+            botMessage.textContent = "Бот: " + botReply;
+            document.getElementById('chatLog').appendChild(botMessage);
+
+            // Голосовой ответ
+            speak(botReply);
+
+            document.getElementById('userInput').value = ''; 
+        }
+    });
+
+    function getBotReply(input) {
+        if (greetingsPattern.test(input)) {
+            return "Привет!";
+        } else if (howAreYouPattern.test(input)) {
+            return "Хорошо, спасибо!";
+        } else if (localStorage.getItem(input)) {
+            return localStorage.getItem(input);
+        } else {
+            let answer = prompt("Я не знаю ответа на этот вопрос. Как я должен ответить на \"" + input + "\" в следующий раз?");
+            localStorage.setItem(input, answer);
+            return answer || "Хорошо, я запомню!";
+        }
+    }
+
+    function speak(text) {
+        var synth = window.speechSynthesis;
+        var utterThis = new SpeechSynthesisUtterance(text);
+        utterThis.lang = 'ru-RU';
+        synth.speak(utterThis);
+    }
+
+    // Рандомное приветствие каждые 30 секунд
+    setInterval(function() {
+        let randomGreeting = greetings[Math.floor(Math.random() * greetings.length)];
+        var botMessage = document.createElement('div');
+        botMessage.textContent = "Бот: " + randomGreeting;
+        document.getElementById('chatLog').appendChild(botMessage);
+        speak(randomGreeting);
+    }, 30000); // интервал в 30 секунд
+
+</script>
+
+</body>
+</html>
